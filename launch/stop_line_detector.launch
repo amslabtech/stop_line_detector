@@ -1,0 +1,32 @@
+<launch>
+
+    <!-- keypoint parameters -->
+    <arg name="up_left_u" default="234"/>
+    <arg name="up_left_v" default="152"/>
+    <arg name="down_left_u" default="192"/>
+    <arg name="down_left_v" default="370"/>
+    <arg name="down_right_u" default="560"/>
+    <arg name="down_right_v" default="370"/>
+    <arg name="up_right_u" default="492"/>
+    <arg name="up_right_v" default="152"/>
+
+    <!-- transform parameters -->
+    <arg name="up_left" default="300"/>
+    <arg name="transform_width" default="100"/>
+    <arg name="transform_height" default="100"/>
+
+    <node pkg="stop_line_detector" type="stop_line_detector" name="stop_line_detector" ns="recognition">
+        <param name="UP_LEFT_U" value="$(arg up_left_u)"/>
+        <param name="UP_LEFT_V" value="$(arg up_left_v)"/>
+        <param name="DOWN_LEFT_U" value="$(arg down_left_u)"/>
+        <param name="DOWN_LEFT_V" value="$(arg down_left_v)"/>
+        <param name="DOWN_RIGHT_U" value="$(arg down_right_u)"/>
+        <param name="DOWN_RIGHT_V" value="$(arg down_right_v)"/>
+        <param name="UP_RIGHT_U" value="$(arg up_right_u)"/>
+        <param name="UP_RIGHT_V" value="$(arg up_right_v)"/>
+        <param name="UP_LEFT" value="$(arg up_left)"/>
+        <param name="TRANSFORM_WIDTH" value="$(arg transform_width)"/>
+        <param name="TRANSFORM_HEIGHT" value="$(arg transform_height)"/>
+    </node>
+
+</launch>
