@@ -9,6 +9,15 @@
     <arg name="down_right_v" default="370"/>
     <arg name="up_right_u" default="492"/>
     <arg name="up_right_v" default="152"/>
+    <arg name="h_min" default="0"/>
+    <arg name="h_max" default="180"/>
+    <arg name="s_min" default="0"/>
+    <arg name="s_max" default="100"/>
+    <arg name="v_min" default="150"/>
+    <arg name="v_max" default="255"/>
+    <arg name="hough_threshold" default="50"/>
+    <arg name="min_line_length" default="30"/>
+    <arg name="max_line_gap" default="100"/>
 
     <!-- transform parameters -->
     <arg name="up_left" default="300"/>
@@ -27,6 +36,15 @@
         <param name="UP_LEFT" value="$(arg up_left)"/>
         <param name="TRANSFORM_WIDTH" value="$(arg transform_width)"/>
         <param name="TRANSFORM_HEIGHT" value="$(arg transform_height)"/>
+        <param name="H_MIN" value="$(arg h_min)"/>
+        <param name="H_MAX" value="$(arg h_max)"/>
+        <param name="S_MIN" value="$(arg s_min)"/>
+        <param name="S_MAX" value="$(arg s_max)"/>
+        <param name="V_MIN" value="$(arg v_min)"/>
+        <param name="V_MAX" value="$(arg v_max)"/>
+        <param name="HOUGH_THRESHOLD" value="$(arg hough_threshold)"/>
+        <param name="MIN_LINE_LENGTH" value="$(arg min_line_length)"/>
+        <param name="MAX_LINE_GAP" value="$(arg max_line_gap)"/>
     </node>
 
 </launch>

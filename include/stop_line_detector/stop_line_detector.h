@@ -29,6 +29,15 @@ private:
     double UP_LEFT;
     double TRANSFORM_WIDTH;
     double TRANSFORM_HEIGHT;
+    double H_MIN;
+    double H_MAX;
+    double S_MIN;
+    double S_MAX;
+    double V_MIN;
+    double V_MAX;
+    int HOUGH_THRESHOLD;
+    double MIN_LINE_LENGTH;
+    double MAX_LINE_GAP;
 
     ros::NodeHandle nh;
     ros::NodeHandle local_nh;
