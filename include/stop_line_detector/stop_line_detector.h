@@ -39,6 +39,9 @@ private:
     int HOUGH_THRESHOLD;
     double MIN_LINE_LENGTH;
     double MAX_LINE_GAP;
+    double ANGLE_DIFF_THRESHOLD;
+    double MIN_DISTANCE_LIMIT;
+    double MAX_DISTANCE_LIMIT;
 
     ros::NodeHandle nh;
     ros::NodeHandle local_nh;

@@ -24,6 +24,9 @@ StopLineDetector::StopLineDetector(void)
     local_nh.param("HOUGH_THRESHOLD", HOUGH_THRESHOLD, {50});
     local_nh.param("MIN_LINE_LENGTH", MIN_LINE_LENGTH, {40});
     local_nh.param("MAX_LINE_GAP", MAX_LINE_GAP, {100});
+    local_nh.param("ANGLE_DIFF_THRESHOLD", ANGLE_DIFF_THRESHOLD, {0.01});
+    local_nh.param("MIN_DISTANCE_LIMIT", MIN_DISTANCE_LIMIT, {8});
+    local_nh.param("MAX_DISTANCE_LIMIT", MAX_DISTANCE_LIMIT, {16});
 
     std::cout << "stop line detector" << std::endl;
     std::cout << "UP_LEFT_U: " << UP_LEFT_U << std::endl;
@@ -46,29 +49,37 @@ StopLineDetector::StopLineDetector(void)
     std::cout << "HOUGH_THRESHOLD: " << HOUGH_THRESHOLD << std::endl;
     std::cout << "MIN_LINE_LENGTH: " << MIN_LINE_LENGTH << std::endl;
     std::cout << "MAX_LINE_GAP: " << MAX_LINE_GAP << std::endl;
+    std::cout << "ANGLE_DIFF_THRESHOLD: " << ANGLE_DIFF_THRESHOLD << std::endl;
+    std::cout << "MAX_DISTANCE_LIMIT: " << MAX_DISTANCE_LIMIT << std::endl;
+    std::cout << "MIN_DISTANCE_LIMIT: " << MIN_DISTANCE_LIMIT << std::endl;
 
     std::vector<cv::Point2f> src_pts = {cv::Point2f(UP_LEFT_U, UP_LEFT_V),
-                                         cv::Point2f(DOWN_LEFT_U, DOWN_LEFT_V),
-                                         cv::Point2f(DOWN_RIGHT_U, DOWN_RIGHT_V),
-                                         cv::Point2f(UP_RIGHT_U, UP_RIGHT_V)};
+                                        cv::Point2f(DOWN_LEFT_U, DOWN_LEFT_V),
+                                        cv::Point2f(DOWN_RIGHT_U, DOWN_RIGHT_V),
+                                        cv::Point2f(UP_RIGHT_U, UP_RIGHT_V)};
 
     std::vector<cv::Point2f> dst_pts = {cv::Point2f(UP_LEFT, UP_LEFT),
-                                           cv::Point2f(UP_LEFT, UP_LEFT + TRANSFORM_HEIGHT),
-                                           cv::Point2f(UP_LEFT + TRANSFORM_WIDTH, UP_LEFT + TRANSFORM_HEIGHT),
-                                           cv::Point2f(UP_LEFT + TRANSFORM_WIDTH, UP_LEFT)};
+                                        cv::Point2f(UP_LEFT, UP_LEFT + TRANSFORM_HEIGHT),
+                                        cv::Point2f(UP_LEFT + TRANSFORM_WIDTH, UP_LEFT + TRANSFORM_HEIGHT),
+                                        cv::Point2f(UP_LEFT + TRANSFORM_WIDTH, UP_LEFT)};
 
     homography_matrix = cv::getPerspectiveTransform(src_pts, dst_pts);
 }
 
 void StopLineDetector::image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
+    std::cout << "--- callback ---" << std::endl;
     cv::Mat image;
     try{
         image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
     }catch(cv_bridge::Exception& ex){
         ROS_ERROR("cv_bridge exception: %s", ex.what());
     }
-    detect_stop_line(image);
+    try{
+        detect_stop_line(image);
+    }catch(cv::Exception& ex){
+        std::cout << ex.what() << std::endl;
+    }
 }
 
 void StopLineDetector::detect_stop_line(const cv::Mat& image)
@@ -94,33 +105,42 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     cv::findContours(filtered_image, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
     cv::Mat contour_image;
     cv::cvtColor(filtered_image, contour_image, CV_GRAY2BGR);
-    //--------------//
-    cv::Scalar contour_color(255, 0, 0);
-    cv::drawContours(contour_image, contours, -1, contour_color, 1, 8, hierarchy);
 
-    int contour_num = contours.size();
-    for(int i=0;i<contour_num;i++){
-        double area = cv::contourArea(contours[i]);
-        if(area < 100){
-            continue;
-        }
-        cv::Rect bb = cv::boundingRect(contours[i]);
-        cv::Scalar bb_color(0, 255, 0);
-        cv::rectangle(contour_image, bb.tl(), bb.br(), bb_color, 1);
-    }
-    //--------------//
     cv::Mat canny_image;
     cv::Canny(filtered_image, canny_image, filtered_image.rows*0.1, filtered_image.rows*0.1, 3, false);
     std::vector<cv::Vec4i> hough_lines;
     cv::HoughLinesP(canny_image, hough_lines, 1, M_PI / 180, HOUGH_THRESHOLD, MIN_LINE_LENGTH, MAX_LINE_GAP);
-    std::vector<cv::Vec4i>::iterator it = hough_lines.begin();
-    cv::Mat line_image;
-    cv::cvtColor(filtered_image, line_image, CV_GRAY2BGR);
-    for (; it != hough_lines.end(); ++it) {
+    cv::Mat line_image = dst_image;
+    for(auto it=hough_lines.begin();it!=hough_lines.end();++it){
         cv::Vec4i l = *it;
-        cv::line(line_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0, 0, 255), 1, CV_AA);
+        double angle = atan2(l[3] - l[1], l[2] - l[0]);
+        for(auto it2=it+1;it2!= hough_lines.end();++it2){
+            cv::Vec4i l2 = *it2;
+            double angle2 = atan2(l2[3] - l2[1], l2[2] - l2[0]);
+            double angle_diff = fabs(angle - angle2);
+            if(angle_diff < ANGLE_DIFF_THRESHOLD){
+                //std::cout << "angle_diff: " << angle_diff << "[rad]" << std::endl;
+                double distance = 100;
+                if(fabs(l[2] - l[0]) < 1e-6){
+                    distance = fabs(l[3] - l[1]);
+                }else{
+                    double a = (l[3] - l[1]) / (l[2] - l[0]);
+                    double b = -1;
+                    double c = l[1] - a * l[0];
+                    distance = fabs(a * l2[0] + b * l2[1] + c) / sqrt(a * a + b * b);
+                }
+                if(MIN_DISTANCE_LIMIT < distance && distance < MAX_DISTANCE_LIMIT){
+                    std::cout << "distance: " << distance << "[px]" << std::endl;
+                    std::cout << "stop line" << std::endl;
+                    std::cout << l << std::endl;
+                    std::cout << l2 << std::endl;
+                    cv::line(line_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(0, 0, 255), 1, CV_AA);
+                    cv::line(line_image, cv::Point(l2[0], l2[1]), cv::Point(l2[2], l2[3]), cv::Scalar(0, 255, 0), 1, CV_AA);
+                    std::cout << "hoge" << std::endl;
+                }
+            }
+        }
     }
-    std::cout << hough_lines.size() << " lines detected" << std::endl;
 
     std::cout << ros::Time::now().toSec() - start << "[s]" << std::endl;
     /*
@@ -133,8 +153,6 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
     cv::imshow("filtered_image", filtered_image);
     */
-    cv::namedWindow("contour_image", cv::WINDOW_NORMAL);
-    cv::imshow("contour_image", contour_image);
     cv::namedWindow("line_image", cv::WINDOW_NORMAL);
     cv::imshow("line_image", line_image);
     cv::waitKey(1);
@@ -143,7 +161,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
 
 void StopLineDetector::process(void)
 {
-    std::cout << "stop line detector" << std::endl;
+    std::cout << "=== stop line detector ===" << std::endl;
     std::cout << "waiting for image..." << std::endl;
     ros::spin();
 }
