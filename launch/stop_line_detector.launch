@@ -28,6 +28,7 @@
     <arg name="transform_height" default="150"/>
 
     <arg name="show_image" default="false"/>
+    <arg name="line_position_v_threshold" default="240"/>
 
     <node pkg="stop_line_detector" type="stop_line_detector" name="stop_line_detector" ns="recognition">
         <param name="UP_LEFT_U" value="$(arg up_left_u)"/>
@@ -54,6 +55,7 @@
         <param name="MIN_DISTANCE_LIMIT" value="$(arg min_distance_limit)"/>
         <param name="MAX_DISTANCE_LIMIT" value="$(arg max_distance_limit)"/>
         <param name="SHOW_IMAGE" value="$(arg show_image)"/>
+        <param name="LINE_POSITION_V_THRESHOLD" value="$(arg line_position_v_threshold)"/>
     </node>
 
 </launch>

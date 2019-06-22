@@ -4,6 +4,8 @@ StopLineDetector::StopLineDetector(void)
 :local_nh("~"), it(nh)
 {
     image_sub = it.subscribe("/camera/color/image_raw", 1, &StopLineDetector::image_callback, this);
+    line_flag_pub = nh.advertise<std_msgs::Bool>("/recognition/stop_line", 1);
+
     local_nh.param("UP_LEFT_U", UP_LEFT_U, {234});
     local_nh.param("UP_LEFT_V", UP_LEFT_V, {152});
     local_nh.param("DOWN_LEFT_U", DOWN_LEFT_U, {192});
@@ -28,6 +30,7 @@ StopLineDetector::StopLineDetector(void)
     local_nh.param("MIN_DISTANCE_LIMIT", MIN_DISTANCE_LIMIT, {8});
     local_nh.param("MAX_DISTANCE_LIMIT", MAX_DISTANCE_LIMIT, {16});
     local_nh.param("SHOW_IMAGE", SHOW_IMAGE, {false});
+    local_nh.param("LINE_POSITION_V_THRESHOLD", LINE_POSITION_V_THRESHOLD, {240});
 
     std::cout << "stop line detector" << std::endl;
     std::cout << "UP_LEFT_U: " << UP_LEFT_U << std::endl;
@@ -54,6 +57,7 @@ StopLineDetector::StopLineDetector(void)
     std::cout << "MAX_DISTANCE_LIMIT: " << MAX_DISTANCE_LIMIT << std::endl;
     std::cout << "MIN_DISTANCE_LIMIT: " << MIN_DISTANCE_LIMIT << std::endl;
     std::cout << "SHOW_IMAGE: " << SHOW_IMAGE << std::endl;
+    std::cout << "LINE_POSITION_V_THRESHOLD: " << LINE_POSITION_V_THRESHOLD << std::endl;
 
     std::vector<cv::Point2f> src_pts = {cv::Point2f(UP_LEFT_U, UP_LEFT_V),
                                         cv::Point2f(DOWN_LEFT_U, DOWN_LEFT_V),
@@ -164,6 +168,14 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
         std::cout << "detected line " << i << ": " << std::endl;
         std::cout << lines[i] << std::endl;
         std::cout << centers[i] << std::endl;
+        std::cout << centers[i].y << std::endl;
+        std::cout << LINE_POSITION_V_THRESHOLD << std::endl;
+        if(LINE_POSITION_V_THRESHOLD < centers[i].y){
+            std::cout << "!!! line !!!" << std::endl;
+            std_msgs::Bool flag;
+            flag.data = true;
+            line_flag_pub.publish(flag);
+        }
     }
     cv::Mat result_image;
     cv::warpPerspective(line_image, result_image, homography_matrix.inv(), result_image.size());

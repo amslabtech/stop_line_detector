@@ -4,10 +4,12 @@
 #include <ros/ros.h>
 
 #include <sensor_msgs/Image.h>
+#include <std_msgs/Bool.h>
 
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+
 
 class StopLineDetector
 {
@@ -45,11 +47,13 @@ private:
     double MIN_DISTANCE_LIMIT;
     double MAX_DISTANCE_LIMIT;
     bool SHOW_IMAGE;
+    int LINE_POSITION_V_THRESHOLD;
 
     ros::NodeHandle nh;
     ros::NodeHandle local_nh;
     image_transport::ImageTransport it;
     image_transport::Subscriber image_sub;
+    ros::Publisher line_flag_pub;
     cv::Mat homography_matrix;
 };
 
