@@ -2,13 +2,13 @@
 
     <!-- keypoint parameters -->
     <arg name="up_left_u" default="234"/>
-    <arg name="up_left_v" default="152"/>
+    <arg name="up_left_v" default="150"/>
     <arg name="down_left_u" default="192"/>
     <arg name="down_left_v" default="370"/>
     <arg name="down_right_u" default="560"/>
     <arg name="down_right_v" default="370"/>
     <arg name="up_right_u" default="492"/>
-    <arg name="up_right_v" default="152"/>
+    <arg name="up_right_v" default="150"/>
     <arg name="h_min" default="0"/>
     <arg name="h_max" default="180"/>
     <arg name="s_min" default="0"/>
@@ -17,15 +17,17 @@
     <arg name="v_max" default="255"/>
     <arg name="hough_threshold" default="50"/>
     <arg name="min_line_length" default="80"/>
-    <arg name="max_line_gap" default="100"/>
+    <arg name="max_line_gap" default="200"/>
     <arg name="angle_diff_threshold" default="0.01"/>
-    <arg name="min_distance_limit" default="8"/>
-    <arg name="max_distance_limit" default="16"/>
+    <arg name="min_distance_limit" default="10"/>
+    <arg name="max_distance_limit" default="20"/>
 
     <!-- transform parameters -->
     <arg name="up_left" default="250"/>
     <arg name="transform_width" default="150"/>
     <arg name="transform_height" default="150"/>
+
+    <arg name="show_image" default="false"/>
 
     <node pkg="stop_line_detector" type="stop_line_detector" name="stop_line_detector" ns="recognition">
         <param name="UP_LEFT_U" value="$(arg up_left_u)"/>
@@ -51,6 +53,7 @@
         <param name="ANGLE_DIFF_THRESHOLD" value="$(arg angle_diff_threshold)"/>
         <param name="MIN_DISTANCE_LIMIT" value="$(arg min_distance_limit)"/>
         <param name="MAX_DISTANCE_LIMIT" value="$(arg max_distance_limit)"/>
+        <param name="SHOW_IMAGE" value="$(arg show_image)"/>
     </node>
 
 </launch>

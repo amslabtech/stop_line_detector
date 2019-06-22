@@ -17,6 +17,8 @@ public:
     void process(void);
     void image_callback(const sensor_msgs::ImageConstPtr&);
     void detect_stop_line(const cv::Mat&);
+    double get_angle(const cv::Vec4i&);
+    double get_length(const cv::Vec4i&);
 
 private:
     double UP_LEFT_U;
@@ -42,6 +44,7 @@ private:
     double ANGLE_DIFF_THRESHOLD;
     double MIN_DISTANCE_LIMIT;
     double MAX_DISTANCE_LIMIT;
+    bool SHOW_IMAGE;
 
     ros::NodeHandle nh;
     ros::NodeHandle local_nh;
