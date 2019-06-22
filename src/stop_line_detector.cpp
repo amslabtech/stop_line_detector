@@ -62,14 +62,18 @@ StopLineDetector::StopLineDetector(void)
 
 void StopLineDetector::image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
-    double start = ros::Time::now().toSec();
     cv::Mat image;
     try{
         image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
     }catch(cv_bridge::Exception& ex){
         ROS_ERROR("cv_bridge exception: %s", ex.what());
     }
+    detect_stop_line(image);
+}
 
+void StopLineDetector::detect_stop_line(const cv::Mat& image)
+{
+    double start = ros::Time::now().toSec();
     cv::Mat dst_image = image;
     cv::warpPerspective(image, dst_image, homography_matrix, dst_image.size());
     cv::medianBlur(dst_image, dst_image, 3);
@@ -134,10 +138,13 @@ void StopLineDetector::image_callback(const sensor_msgs::ImageConstPtr& msg)
     cv::namedWindow("line_image", cv::WINDOW_NORMAL);
     cv::imshow("line_image", line_image);
     cv::waitKey(1);
+
 }
 
 void StopLineDetector::process(void)
 {
+    std::cout << "stop line detector" << std::endl;
+    std::cout << "waiting for image..." << std::endl;
     ros::spin();
 }
 

@@ -16,6 +16,7 @@ public:
 
     void process(void);
     void image_callback(const sensor_msgs::ImageConstPtr&);
+    void detect_stop_line(const cv::Mat&);
 
 private:
     double UP_LEFT_U;
