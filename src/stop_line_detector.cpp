@@ -102,9 +102,12 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     cv::Scalar hsv_max(H_MAX, S_MAX, V_MAX);
     cv::Mat mask_image;
     cv::inRange(hsv_image, hsv_min, hsv_max, mask_image);
+    cv::threshold(mask_image, mask_image, 0, 255, cv::THRESH_BINARY);
 
     cv::Mat filtered_image;
-    cv::medianBlur(mask_image, filtered_image, 3);
+    cv::morphologyEx(mask_image, filtered_image, cv::MORPH_CLOSE, cv::Mat());
+    cv::morphologyEx(filtered_image, filtered_image, cv::MORPH_OPEN, cv::Mat());
+    cv::medianBlur(filtered_image, filtered_image, 3);
 
     cv::Mat canny_image;
     cv::Canny(filtered_image, canny_image, filtered_image.rows*0.1, filtered_image.rows*0.1, 3, false);
@@ -189,11 +192,13 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
         cv::imshow("transformed_image", dst_image);
         cv::namedWindow("hsv_image", cv::WINDOW_NORMAL);
         cv::imshow("hsv_image", hsv_image);
-        */
+        cv::namedWindow("mask_image", cv::WINDOW_NORMAL);
+        cv::imshow("mask_image", mask_image);
         cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
         cv::imshow("filtered_image", filtered_image);
         cv::namedWindow("line_image", cv::WINDOW_NORMAL);
         cv::imshow("line_image", line_image);
+        */
         cv::namedWindow("result_image", cv::WINDOW_NORMAL);
         cv::imshow("result_image", result_image);
         cv::waitKey(1);
