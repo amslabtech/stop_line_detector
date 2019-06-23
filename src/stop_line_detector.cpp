@@ -185,15 +185,15 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
         /*
         cv::namedWindow("transformed_image", cv::WINDOW_NORMAL);
         cv::imshow("transformed_image", dst_image);
-        cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
-        cv::imshow("filtered_image", filtered_image);
+        cv::namedWindow("transformed_image", cv::WINDOW_NORMAL);
+        cv::imshow("transformed_image", dst_image);
         cv::namedWindow("hsv_image", cv::WINDOW_NORMAL);
         cv::imshow("hsv_image", hsv_image);
+        */
         cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
         cv::imshow("filtered_image", filtered_image);
         cv::namedWindow("line_image", cv::WINDOW_NORMAL);
         cv::imshow("line_image", line_image);
-        */
         cv::namedWindow("result_image", cv::WINDOW_NORMAL);
         cv::imshow("result_image", result_image);
         cv::waitKey(1);

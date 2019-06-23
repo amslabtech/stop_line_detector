@@ -1,14 +1,14 @@
 <launch>
 
     <!-- keypoint parameters -->
-    <arg name="up_left_u" default="234"/>
-    <arg name="up_left_v" default="150"/>
-    <arg name="down_left_u" default="192"/>
-    <arg name="down_left_v" default="370"/>
-    <arg name="down_right_u" default="560"/>
-    <arg name="down_right_v" default="370"/>
-    <arg name="up_right_u" default="492"/>
-    <arg name="up_right_v" default="150"/>
+    <arg name="up_left_u" default="216"/>
+    <arg name="up_left_v" default="154"/>
+    <arg name="down_left_u" default="163"/>
+    <arg name="down_left_v" default="372"/>
+    <arg name="down_right_u" default="522"/>
+    <arg name="down_right_v" default="372"/>
+    <arg name="up_right_u" default="466"/>
+    <arg name="up_right_v" default="154"/>
     <arg name="h_min" default="0"/>
     <arg name="h_max" default="180"/>
     <arg name="s_min" default="0"/>
@@ -17,7 +17,7 @@
     <arg name="v_max" default="255"/>
     <arg name="hough_threshold" default="100"/>
     <arg name="min_line_length" default="80"/>
-    <arg name="max_line_gap" default="10"/>
+    <arg name="max_line_gap" default="30"/>
     <arg name="angle_diff_threshold" default="0.01"/>
     <arg name="min_distance_limit" default="10"/>
     <arg name="max_distance_limit" default="20"/>
