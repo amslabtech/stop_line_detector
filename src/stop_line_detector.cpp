@@ -145,8 +145,6 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
                     }
                     if(registered_flag){
                         continue;
-                    }else{
-                        lines.push_back(l2);
                     }
                     std::cout << "distance: " << distance << "[px]" << std::endl;
                     std::cout << "stop line" << std::endl;
@@ -155,10 +153,17 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
                     std::cout << l2 << std::endl;
                     std::cout << get_length(l2) << std::endl;
                     cv::Scalar color(l[0] / (double)image.cols * 255, l[1] / (double)image.rows * 255, 0);
+                    cv::Point center((l[0] + l[2] + l2[0] + l2[2]) / 4.0, (l[1] + l[3] + l2[1] + l2[3]) / 4.0);
+                    std::cout << center << std::endl;
+                    std::cout << (int)filtered_image.at<unsigned char>(center.y, center.x) << std::endl;
+                    if(filtered_image.at<unsigned char>(center.y, center.x) == 0){
+                        // not white line
+                        break;
+                    }
+                    centers.push_back(center);
+                    lines.push_back(l2);
                     cv::line(line_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), color, 1, CV_AA);
                     cv::line(line_image, cv::Point(l2[0], l2[1]), cv::Point(l2[2], l2[3]), color, 1, CV_AA);
-                    cv::Point center((l[0] + l[2] + l2[0] + l2[2]) / 4.0, (l[1] + l[3] + l2[1] + l2[3]) / 4.0);
-                    centers.push_back(center);
                     cv::putText(line_image, "line", center, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
                     break;
                 }
@@ -170,9 +175,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     for(int i=0;i<n;i++){
         std::cout << "detected line " << i << ": " << std::endl;
         std::cout << lines[i] << std::endl;
-        std::cout << centers[i] << std::endl;
-        std::cout << centers[i].y << std::endl;
-        std::cout << LINE_POSITION_V_THRESHOLD << std::endl;
+        std::cout << "center: " << centers[i] << std::endl;
         if(LINE_POSITION_V_THRESHOLD < centers[i].y){
             std::cout << "!!! line !!!" << std::endl;
             std_msgs::Bool flag;
@@ -190,15 +193,15 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
         cv::imshow("transformed_image", dst_image);
         cv::namedWindow("transformed_image", cv::WINDOW_NORMAL);
         cv::imshow("transformed_image", dst_image);
+        */
         cv::namedWindow("hsv_image", cv::WINDOW_NORMAL);
         cv::imshow("hsv_image", hsv_image);
-        cv::namedWindow("mask_image", cv::WINDOW_NORMAL);
-        cv::imshow("mask_image", mask_image);
+        //cv::namedWindow("mask_image", cv::WINDOW_NORMAL);
+        //cv::imshow("mask_image", mask_image);
         cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
         cv::imshow("filtered_image", filtered_image);
         cv::namedWindow("line_image", cv::WINDOW_NORMAL);
         cv::imshow("line_image", line_image);
-        */
         cv::namedWindow("result_image", cv::WINDOW_NORMAL);
         cv::imshow("result_image", result_image);
         cv::waitKey(1);
