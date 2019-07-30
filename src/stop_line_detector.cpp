@@ -4,7 +4,8 @@ StopLineDetector::StopLineDetector(void)
 :local_nh("~"), it(nh)
 {
     image_sub = it.subscribe("/camera/color/image_raw", 1, &StopLineDetector::image_callback, this);
-    line_flag_pub = nh.advertise<std_msgs::Bool>("/recognition/stop_line", 1);
+    line_flag_pub = nh.advertise<std_msgs::Bool>("/recognition/stop_line/line", 1);
+	T_line_flag_pub = nh.advertise<std_msgs::Bool>("/recognition/stop_line/T_line", 1);
 
     local_nh.param("UP_LEFT_U", UP_LEFT_U, {234});
     local_nh.param("UP_LEFT_V", UP_LEFT_V, {152});
@@ -74,7 +75,7 @@ StopLineDetector::StopLineDetector(void)
 
 void StopLineDetector::image_callback(const sensor_msgs::ImageConstPtr& msg)
 {
-    std::cout << "--- callback ---" << std::endl;
+    //std::cout << "--- callback ---" << std::endl;
     cv::Mat image;
     try{
         image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8)->image;
@@ -107,6 +108,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     cv::Mat filtered_image;
     cv::morphologyEx(mask_image, filtered_image, cv::MORPH_CLOSE, cv::Mat());
     cv::morphologyEx(filtered_image, filtered_image, cv::MORPH_OPEN, cv::Mat());
+
     cv::medianBlur(filtered_image, filtered_image, 3);
 
     cv::Mat canny_image;
@@ -115,7 +117,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     cv::HoughLinesP(canny_image, hough_lines, 1, M_PI / 180, HOUGH_THRESHOLD, MIN_LINE_LENGTH, MAX_LINE_GAP);
     cv::Mat line_image = dst_image;
 
-    std::vector<cv::Vec4i> lines;
+	std::vector<std::vector<cv::Vec4i>> lines(2);
     std::vector<cv::Point> centers;
 
     for(auto it=hough_lines.begin();it!=hough_lines.end();++it){
@@ -138,7 +140,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
                 }
                 if(MIN_DISTANCE_LIMIT < distance && distance < MAX_DISTANCE_LIMIT){
                     bool registered_flag = false;
-                    for(auto line : lines){
+                    for(auto line : lines[1]){
                         if(fabs(get_angle(line) - get_angle(l2)) < ANGLE_DIFF_THRESHOLD){
                             registered_flag = true;
                         }
@@ -146,47 +148,73 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
                     if(registered_flag){
                         continue;
                     }
-                    std::cout << "distance: " << distance << "[px]" << std::endl;
-                    std::cout << "stop line" << std::endl;
-                    std::cout << l << std::endl;
-                    std::cout << get_length(l) << std::endl;
-                    std::cout << l2 << std::endl;
-                    std::cout << get_length(l2) << std::endl;
-                    cv::Scalar color(l[0] / (double)image.cols * 255, l[1] / (double)image.rows * 255, 0);
+                    //std::cout << "distance: " << distance << "[px]" << std::endl;
+                    //std::cout << "stop line" << std::endl;
+                    //std::cout << l << std::endl;
+                    //std::cout << get_length(l) << std::endl;
+                    //std::cout << l2 << std::endl;
+                    //std::cout << get_length(l2) << std::endl;
+                    //cv::Scalar color(l[0] / (double)image.cols * 255, l[1] / (double)image.rows * 255, 0);
                     cv::Point center((l[0] + l[2] + l2[0] + l2[2]) / 4.0, (l[1] + l[3] + l2[1] + l2[3]) / 4.0);
-                    std::cout << center << std::endl;
-                    std::cout << (int)filtered_image.at<unsigned char>(center.y, center.x) << std::endl;
+                    //std::cout << center << std::endl;
+                    //std::cout << (int)filtered_image.at<unsigned char>(center.y, center.x) << std::endl;
                     if(filtered_image.at<unsigned char>(center.y, center.x) == 0){
                         // not white line
                         break;
                     }
                     centers.push_back(center);
-                    lines.push_back(l2);
-                    cv::line(line_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), color, 1, CV_AA);
-                    cv::line(line_image, cv::Point(l2[0], l2[1]), cv::Point(l2[2], l2[3]), color, 1, CV_AA);
-                    cv::putText(line_image, "line", center, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
+                    lines[0].push_back(l);
+                    lines[1].push_back(l2);
+                    //cv::line(line_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), color, 1, CV_AA);
+                    //cv::line(line_image, cv::Point(l2[0], l2[1]), cv::Point(l2[2], l2[3]), color, 1, CV_AA);
+                    //cv::putText(line_image, "line", center, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
                     break;
                 }
             }
         }
     }
-    int n = lines.size();
-    std::cout << "detected lines: " << n << std::endl;
+    int n = lines[0].size();
+	bool t_flag = false;
+
+	for(int i=0;i<n;i++){
+		for(int j=i;j<n;j++){
+			std::cout << "l1_angle :" << get_angle(lines[0][i]) << std::endl;
+			std::cout << "l2_angle :" << get_angle(lines[0][j]) << std::endl;
+			if(fabs(get_angle(lines[0][i]) - get_angle(lines[0][j])) > 1.0)
+				t_flag = true;
+		}
+	}
+
+    //std::cout << "detected lines: " << n << std::endl;
     for(int i=0;i<n;i++){
-        std::cout << "detected line " << i << ": " << std::endl;
-        std::cout << lines[i] << std::endl;
-        std::cout << "center: " << centers[i] << std::endl;
+		if(!t_flag){
+			cv::Scalar color = CV_RGB(0,0,255);
+        	cv::line(line_image, cv::Point(lines[0][i][0], lines[0][i][1]), cv::Point(lines[0][i][2], lines[0][i][3]), color, 1, CV_AA);
+        	cv::line(line_image, cv::Point(lines[1][i][0], lines[1][i][1]), cv::Point(lines[1][i][2], lines[1][i][3]), color, 1, CV_AA);
+        	cv::putText(line_image, "line", centers[i], cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
+		}else{
+			cv::Scalar color = CV_RGB(255,0,0);
+        	cv::line(line_image, cv::Point(lines[0][i][0], lines[0][i][1]), cv::Point(lines[0][i][2], lines[0][i][3]), color, 1, CV_AA);
+        	cv::line(line_image, cv::Point(lines[1][i][0], lines[1][i][1]), cv::Point(lines[1][i][2], lines[1][i][3]), color, 1, CV_AA);
+        	cv::putText(line_image, "T_line", centers[i], cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
+		}
+        //std::cout << "detected line " << i << ": " << std::endl;
+       	//std::cout << lines[0][i] << std::endl;
+       	//std::cout << "center: " << centers[i] << std::endl;
         if(LINE_POSITION_V_THRESHOLD < centers[i].y){
-            std::cout << "!!! line !!!" << std::endl;
+            //std::cout << "!!! line !!!" << std::endl;
             std_msgs::Bool flag;
             flag.data = true;
-            line_flag_pub.publish(flag);
+			if(!t_flag)
+            	line_flag_pub.publish(flag);
+			else
+				T_line_flag_pub.publish(flag);
         }
     }
     cv::Mat result_image;
     cv::warpPerspective(line_image, result_image, homography_matrix.inv(), result_image.size());
 
-    std::cout << ros::Time::now().toSec() - start << "[s]" << std::endl;
+    //std::cout << ros::Time::now().toSec() - start << "[s]" << std::endl;
     if(SHOW_IMAGE){
         /*
         cv::namedWindow("transformed_image", cv::WINDOW_NORMAL);
@@ -194,16 +222,16 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
         cv::namedWindow("transformed_image", cv::WINDOW_NORMAL);
         cv::imshow("transformed_image", dst_image);
         */
-        cv::namedWindow("hsv_image", cv::WINDOW_NORMAL);
-        cv::imshow("hsv_image", hsv_image);
+        //cv::namedWindow("hsv_image", cv::WINDOW_NORMAL);
+        //cv::imshow("hsv_image", hsv_image);
         //cv::namedWindow("mask_image", cv::WINDOW_NORMAL);
         //cv::imshow("mask_image", mask_image);
         cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
         cv::imshow("filtered_image", filtered_image);
         cv::namedWindow("line_image", cv::WINDOW_NORMAL);
         cv::imshow("line_image", line_image);
-        cv::namedWindow("result_image", cv::WINDOW_NORMAL);
-        cv::imshow("result_image", result_image);
+        //cv::namedWindow("result_image", cv::WINDOW_NORMAL);
+        //cv::imshow("result_image", result_image);
         cv::waitKey(1);
     }
 }

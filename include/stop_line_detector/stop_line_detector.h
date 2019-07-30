@@ -54,6 +54,7 @@ private:
     image_transport::ImageTransport it;
     image_transport::Subscriber image_sub;
     ros::Publisher line_flag_pub;
+    ros::Publisher T_line_flag_pub;
     cv::Mat homography_matrix;
 };
 
