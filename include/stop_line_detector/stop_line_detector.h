@@ -40,6 +40,8 @@ private:
     double S_MAX;
     double V_MIN;
     double V_MAX;
+	double APPROX_EPSILON;
+	double POLY_THICKNESS;
     int HOUGH_THRESHOLD;
     double MIN_LINE_LENGTH;
     double MAX_LINE_GAP;

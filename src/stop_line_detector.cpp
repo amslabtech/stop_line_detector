@@ -24,6 +24,8 @@ StopLineDetector::StopLineDetector(void)
     local_nh.param("S_MAX", S_MAX, {255});
     local_nh.param("V_MIN", V_MIN, {0});
     local_nh.param("V_MAX", V_MAX, {255});
+	local_nh.param("APPROX_EPSILON", APPROX_EPSILON, {4.0});
+	local_nh.param("POLY_THICKNESS", POLY_THICKNESS, {2.0});
     local_nh.param("HOUGH_THRESHOLD", HOUGH_THRESHOLD, {50});
     local_nh.param("MIN_LINE_LENGTH", MIN_LINE_LENGTH, {40});
     local_nh.param("MAX_LINE_GAP", MAX_LINE_GAP, {100});
@@ -51,6 +53,8 @@ StopLineDetector::StopLineDetector(void)
     std::cout << "S_MAX: " << S_MAX << std::endl;
     std::cout << "V_MIN: " << V_MIN << std::endl;
     std::cout << "V_MAX: " << V_MAX << std::endl;
+	std::cout << "APPROX_EPSILON: " << APPROX_EPSILON << std::endl;
+	std::cout << "POLY_THICKNESS: " << POLY_THICKNESS << std::endl;
     std::cout << "HOUGH_THRESHOLD: " << HOUGH_THRESHOLD << std::endl;
     std::cout << "MIN_LINE_LENGTH: " << MIN_LINE_LENGTH << std::endl;
     std::cout << "MAX_LINE_GAP: " << MAX_LINE_GAP << std::endl;
@@ -110,11 +114,23 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     cv::morphologyEx(filtered_image, filtered_image, cv::MORPH_OPEN, cv::Mat());
 
     cv::medianBlur(filtered_image, filtered_image, 3);
-
     cv::Mat canny_image;
     cv::Canny(filtered_image, canny_image, filtered_image.rows*0.1, filtered_image.rows*0.1, 3, false);
+
+	std::vector<std::vector<cv::Point>> contours;
+	std::vector<cv::Vec4i> hierarchy;
+	cv::Mat contour_image = cv::Mat::zeros(filtered_image.size(), CV_8U);
+	cv::findContours(canny_image, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE); 
+
+	std::vector<std::vector<cv::Point>> approx(contours.size());
+	for(size_t i=0; i<contours.size(); i++){
+		cv::approxPolyDP(cv::Mat(contours[i]), approx[i], APPROX_EPSILON, false);
+		cv::polylines(contour_image, approx, false, cv::Scalar(255, 255, 255), POLY_THICKNESS);
+	}
+
     std::vector<cv::Vec4i> hough_lines;
-    cv::HoughLinesP(canny_image, hough_lines, 1, M_PI / 180, HOUGH_THRESHOLD, MIN_LINE_LENGTH, MAX_LINE_GAP);
+    //cv::HoughLinesP(canny_image, hough_lines, 1, M_PI / 180, HOUGH_THRESHOLD, MIN_LINE_LENGTH, MAX_LINE_GAP);
+	cv::HoughLinesP(contour_image, hough_lines, 1, M_PI / 180, HOUGH_THRESHOLD, MIN_LINE_LENGTH, MAX_LINE_GAP);
     cv::Mat line_image = dst_image;
 
 	std::vector<std::vector<cv::Vec4i>> lines(2);
@@ -228,6 +244,10 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
         //cv::imshow("mask_image", mask_image);
         cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
         cv::imshow("filtered_image", filtered_image);
+        cv::namedWindow("contour_image", cv::WINDOW_NORMAL);
+        cv::imshow("contour_image", contour_image);
+        cv::namedWindow("canny_image", cv::WINDOW_NORMAL);
+        cv::imshow("canny_image", canny_image);
         cv::namedWindow("line_image", cv::WINDOW_NORMAL);
         cv::imshow("line_image", line_image);
         //cv::namedWindow("result_image", cv::WINDOW_NORMAL);
