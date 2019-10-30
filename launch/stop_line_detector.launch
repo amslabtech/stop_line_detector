@@ -32,7 +32,7 @@
     <arg name="show_image" default="true"/>
     <arg name="line_position_v_threshold" default="240"/>
 
-    <node pkg="stop_line_detector" type="stop_line_detector" name="stop_line_detector" ns="recognition" >
+    <node pkg="stop_line_detector" type="stop_line_detector" name="stop_line_detector" ns="recognition" output="screen">
         <param name="UP_LEFT_U" value="$(arg up_left_u)"/>
         <param name="UP_LEFT_V" value="$(arg up_left_v)"/>
         <param name="DOWN_LEFT_U" value="$(arg down_left_u)"/>
