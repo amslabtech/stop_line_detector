@@ -18,7 +18,6 @@ public:
 
     void process(void);
     void image_callback(const sensor_msgs::ImageConstPtr&);
-    void flag_callback(const std_msgs::BoolConstPtr&);
     void detect_stop_line(const cv::Mat&);
     double get_angle(const cv::Vec4i&);
     double get_length(const cv::Vec4i&);

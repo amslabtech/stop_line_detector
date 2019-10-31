@@ -12,8 +12,8 @@
     <arg name="h_min" default="0"/>
     <arg name="h_max" default="180"/>
     <arg name="s_min" default="0"/>
-    <arg name="s_max" default="10"/>
-    <arg name="v_min" default="230"/>
+    <arg name="s_max" default="55"/>
+    <arg name="v_min" default="200"/>
     <arg name="v_max" default="255"/>
     <arg name="approx_epsilon" default="3.8"/>
     <arg name="poly_thickness" default="1.0"/>

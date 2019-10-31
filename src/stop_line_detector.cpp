@@ -152,7 +152,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
                     double c = l[1] - a * l[0];
                     distance = fabs(a * l2[0] + b * l2[1] + c) / sqrt(a * a + b * b);
                 }
-                //std::cout << "distance: " << distance << "[px]" << std::endl;
+                // std::cout << "distance: " << distance << "[px]" << std::endl;
                 if(MIN_DISTANCE_LIMIT < distance && distance < MAX_DISTANCE_LIMIT){
                     bool registered_flag = false;
                     for(auto line : lines[1]){
@@ -231,24 +231,20 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     cv::warpPerspective(line_image, result_image, homography_matrix.inv(), result_image.size());
     //std::cout << ros::Time::now().toSec() - start << "[s]" << std::endl;
     if(SHOW_IMAGE){
-        /*
-        cv::namedWindow("transformed_image", cv::WINDOW_NORMAL);
-        cv::imshow("transformed_image", dst_image);
-        cv::namedWindow("transformed_image", cv::WINDOW_NORMAL);
-        cv::imshow("transformed_image", dst_image);
-        */
+        // cv::namedWindow("transformed_image", cv::WINDOW_NORMAL);
+        // cv::imshow("transformed_image", dst_image);
         //cv::namedWindow("hsv_image", cv::WINDOW_NORMAL);
         //cv::imshow("hsv_image", hsv_image);
         //cv::namedWindow("mask_image", cv::WINDOW_NORMAL);
         //cv::imshow("mask_image", mask_image);
-        // cv::namedWindow("hough_image", cv::WINDOW_NORMAL);
-        // cv::imshow("hough_image", hough_image);
-        // cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
-        // cv::imshow("filtered_image", filtered_image);
-        // cv::namedWindow("contour_image", cv::WINDOW_NORMAL);
-        // cv::imshow("contour_image", contour_image);
-        // cv::namedWindow("canny_image", cv::WINDOW_NORMAL);
-        // cv::imshow("canny_image", canny_image);
+        cv::namedWindow("hough_image", cv::WINDOW_NORMAL);
+        cv::imshow("hough_image", hough_image);
+        cv::namedWindow("filtered_image", cv::WINDOW_NORMAL);
+        cv::imshow("filtered_image", filtered_image);
+        cv::namedWindow("contour_image", cv::WINDOW_NORMAL);
+        cv::imshow("contour_image", contour_image);
+        //cv::namedWindow("canny_image", cv::WINDOW_NORMAL);
+        //cv::imshow("canny_image", canny_image);
         cv::namedWindow("line_image", cv::WINDOW_NORMAL);
         cv::imshow("line_image", line_image);
         //cv::namedWindow("result_image", cv::WINDOW_NORMAL);
