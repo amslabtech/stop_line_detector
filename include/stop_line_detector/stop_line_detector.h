@@ -6,9 +6,9 @@
 #include <tf/tf.h>
 
 #include <sensor_msgs/Image.h>
-#include <std_msgs/Bool.h>
 #include <nav_msgs/Odometry.h>
 #include <amsl_navigation_msgs/Edge.h>
+#include <amsl_navigation_msgs/StopLine.h>
 
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
@@ -63,8 +63,7 @@ private:
     image_transport::Subscriber image_sub;
     ros::Subscriber pose_sub;
     ros::Subscriber edge_sub;
-    ros::Publisher line_flag_pub;
-    ros::Publisher T_line_flag_pub;
+    ros::Publisher line_pub;
 
     cv::Mat homography_matrix;
     double robot_direction;

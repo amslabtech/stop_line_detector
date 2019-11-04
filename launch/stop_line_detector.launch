@@ -13,16 +13,16 @@
     <arg name="h_max" default="180"/>
     <arg name="s_min" default="0"/>
     <arg name="s_max" default="80"/>
-    <arg name="v_min" default="230"/>
+    <arg name="v_min" default="240"/>
     <arg name="v_max" default="255"/>
     <arg name="approx_epsilon" default="3.8"/>
     <arg name="poly_thickness" default="1.0"/>
     <arg name="hough_threshold" default="85"/>
-    <arg name="min_line_length" default="100"/>
+    <arg name="min_line_length" default="110"/>
     <arg name="max_line_gap" default="25"/>
     <arg name="angle_diff_threshold" default="0.02"/>
-    <arg name="min_distance_limit" default="9.7"/>
-    <arg name="max_distance_limit" default="15.5"/>
+    <arg name="min_distance_limit" default="9.8"/>
+    <arg name="max_distance_limit" default="15.0"/>
 
     <!-- transform parameters -->
     <arg name="up_left" default="250"/>
