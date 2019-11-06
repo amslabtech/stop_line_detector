@@ -3,8 +3,12 @@
 
 #include <ros/ros.h>
 
+#include <tf/tf.h>
+
 #include <sensor_msgs/Image.h>
-#include <std_msgs/Bool.h>
+#include <nav_msgs/Odometry.h>
+#include <amsl_navigation_msgs/Edge.h>
+#include <amsl_navigation_msgs/StopLine.h>
 
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
@@ -18,6 +22,8 @@ public:
 
     void process(void);
     void image_callback(const sensor_msgs::ImageConstPtr&);
+    void pose_callback(const nav_msgs::OdometryConstPtr&);
+    void edge_callback(const amsl_navigation_msgs::EdgeConstPtr&);
     void detect_stop_line(const cv::Mat&);
     double get_angle(const cv::Vec4i&);
     double get_length(const cv::Vec4i&);
@@ -40,6 +46,8 @@ private:
     double S_MAX;
     double V_MIN;
     double V_MAX;
+    double APPROX_EPSILON;
+    double POLY_THICKNESS;
     int HOUGH_THRESHOLD;
     double MIN_LINE_LENGTH;
     double MAX_LINE_GAP;
@@ -53,8 +61,13 @@ private:
     ros::NodeHandle local_nh;
     image_transport::ImageTransport it;
     image_transport::Subscriber image_sub;
-    ros::Publisher line_flag_pub;
+    ros::Subscriber pose_sub;
+    ros::Subscriber edge_sub;
+    ros::Publisher line_pub;
+
     cv::Mat homography_matrix;
+    double robot_direction;
+    double edge_direction;
 };
 
 #endif// __STOP_LINE_DETECTOR_H
