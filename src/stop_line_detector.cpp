@@ -259,13 +259,20 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
                 std::cout << "\033[31m----- line ----- \033[m" << std::endl;
                 line_info.is_t_shape = true;
                 line_info.angle = line_angles[0];
-                line_pub.publish(line_info);
             }else{
                 std::cout << "\033[33m----- line ----- \033[m" << std::endl;
                 line_info.is_t_shape = false;
                 line_info.angle = line_angles[i];
-                line_pub.publish(line_info);
             }
+            if(fabs(line_angles[i])>0.25*M_PI){
+                std::cout << "line trace" << std::endl;
+                line_info.center_point = calc_center_point(centers[i]);
+            }else{
+                line_info.center_point.x = 0.0;
+                line_info.center_point.y = 0.0;
+            }
+            std::cout << line_info << std::endl;
+            line_pub.publish(line_info);
         }
     }
     cv::Mat result_image;
@@ -292,6 +299,16 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
         // cv::imshow("result_image", result_image);
         cv::waitKey(1);
     }
+}
+
+geometry_msgs::Point StopLineDetector::calc_center_point(cv::Point center_point)
+{
+    geometry_msgs::Point point;
+    double x = (1.0-(center_point.y)/640.0)*0.5+0.1;
+    double y = (center_point.x-320)/320.0*1.0;
+    point.x = x;
+    point.y = y;
+    return point;
 }
 
 double StopLineDetector::get_angle(const cv::Vec4i& l)

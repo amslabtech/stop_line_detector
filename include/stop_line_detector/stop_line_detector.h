@@ -65,6 +65,8 @@ private:
     ros::Subscriber edge_sub;
     ros::Publisher line_pub;
 
+    geometry_msgs::Point calc_center_point(cv::Point);
+
     cv::Mat homography_matrix;
     double robot_direction;
     double edge_direction;
