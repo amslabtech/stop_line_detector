@@ -29,10 +29,10 @@
     <arg name="transform_width" default="150"/>
     <arg name="transform_height" default="150"/>
 
-    <arg name="show_image" default="true"/>
+    <arg name="show_image" default="false"/>
     <arg name="line_position_v_threshold" default="240"/>
 
-    <node pkg="stop_line_detector" type="stop_line_detector" name="stop_line_detector" ns="recognition" output="screen">
+    <node pkg="stop_line_detector" type="stop_line_detector" name="stop_line_detector" ns="recognition">
         <param name="UP_LEFT_U" value="$(arg up_left_u)"/>
         <param name="UP_LEFT_V" value="$(arg up_left_v)"/>
         <param name="DOWN_LEFT_U" value="$(arg down_left_u)"/>
