@@ -133,7 +133,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
     cv::Mat contour_image = cv::Mat::zeros(filtered_image.size(), CV_8U);
-    cv::findContours(canny_image, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE); 
+    cv::findContours(canny_image, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
 
     cv::Mat hough_image = contour_image.clone();
     std::vector<std::vector<cv::Point>> approx(contours.size());
@@ -221,7 +221,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
                 break;
             }
         }
-        double direction_diff = robot_direction - edge_direction; 
+        double direction_diff = robot_direction - edge_direction;
         double angle_diff = line_angle1 - M_PI*0.5 + direction_diff;
         angle_diff = fabs(atan2(sin(angle_diff), cos(angle_diff)));
         if(angle_diff > M_PI*0.25 && angle_diff < M_PI*0.75){
@@ -304,8 +304,8 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
 geometry_msgs::Point StopLineDetector::calc_center_point(cv::Point center_point)
 {
     geometry_msgs::Point point;
-    double x = (1.0-(center_point.y)/640.0)*0.5+0.1;
-    double y = (center_point.x-320)/320.0*1.0;
+    double x = (1.0-(center_point.y)/640.0)*0.5+0.3;
+    double y = -(center_point.x-320)/320.0*0.5;
     point.x = x;
     point.y = y;
     return point;
