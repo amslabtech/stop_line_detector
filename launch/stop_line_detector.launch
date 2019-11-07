@@ -17,7 +17,7 @@
     <arg name="v_max" default="255"/>
     <arg name="approx_epsilon" default="3.8"/>
     <arg name="poly_thickness" default="1.0"/>
-    <arg name="hough_threshold" default="85"/>
+    <arg name="hough_threshold" default="100"/>
     <arg name="min_line_length" default="110"/>
     <arg name="max_line_gap" default="25"/>
     <arg name="angle_diff_threshold" default="0.02"/>
