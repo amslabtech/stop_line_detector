@@ -148,7 +148,7 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     std::vector<cv::Point> centers;
     for(auto it=hough_lines.begin();it!=hough_lines.end();++it){
         cv::Vec4i l = *it;
-        cv::line(hough_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(255, 255, 255), 2, CV_AA);
+        cv::line(hough_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(255, 255, 255), 2, cv::LINE_AA);
         double angle = get_angle(l);
         for(auto it2=it+1;it2!= hough_lines.end();++it2){
             cv::Vec4i l2 = *it2;
@@ -193,9 +193,9 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
                     centers.push_back(center);
                     lines[0].push_back(l);
                     lines[1].push_back(l2);
-                    //cv::line(line_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), color, 1, CV_AA);
-                    //cv::line(line_image, cv::Point(l2[0], l2[1]), cv::Point(l2[2], l2[3]), color, 1, CV_AA);
-                    //cv::putText(line_image, "line", center, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
+                    //cv::line(line_image, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), color, 1, cv::LINE_AA);
+                    //cv::line(line_image, cv::Point(l2[0], l2[1]), cv::Point(l2[2], l2[3]), color, 1, cv::LINE_AA);
+                    //cv::putText(line_image, "line", center, cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv::LINE_AA);
                     break;
                 }
             }
@@ -240,14 +240,14 @@ void StopLineDetector::detect_stop_line(const cv::Mat& image)
     for(int i=0;i<n;i++){
         if(t_flag){
             cv::Scalar color = CV_RGB(255,0,0);//red
-            cv::line(line_image, cv::Point(lines[0][i][0], lines[0][i][1]), cv::Point(lines[0][i][2], lines[0][i][3]), color, 1, CV_AA);
-            cv::line(line_image, cv::Point(lines[1][i][0], lines[1][i][1]), cv::Point(lines[1][i][2], lines[1][i][3]), color, 1, CV_AA);
-            cv::putText(line_image, "T_line", centers[i], cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, CV_AA);
+            cv::line(line_image, cv::Point(lines[0][i][0], lines[0][i][1]), cv::Point(lines[0][i][2], lines[0][i][3]), color, 1, cv::LINE_AA);
+            cv::line(line_image, cv::Point(lines[1][i][0], lines[1][i][1]), cv::Point(lines[1][i][2], lines[1][i][3]), color, 1, cv::LINE_AA);
+            cv::putText(line_image, "T_line", centers[i], cv::FONT_HERSHEY_SIMPLEX, 0.5, color, 1, cv::LINE_AA);
         }else{
             // cv::Scalar color = CV_RGB(0,0,255);
-            cv::line(line_image, cv::Point(lines[0][i][0], lines[0][i][1]), cv::Point(lines[0][i][2], lines[0][i][3]), colors[i], 1, CV_AA);
-            cv::line(line_image, cv::Point(lines[1][i][0], lines[1][i][1]), cv::Point(lines[1][i][2], lines[1][i][3]), colors[i], 1, CV_AA);
-            cv::putText(line_image, "line", centers[i], cv::FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 1, CV_AA);
+            cv::line(line_image, cv::Point(lines[0][i][0], lines[0][i][1]), cv::Point(lines[0][i][2], lines[0][i][3]), colors[i], 1, cv::LINE_AA);
+            cv::line(line_image, cv::Point(lines[1][i][0], lines[1][i][1]), cv::Point(lines[1][i][2], lines[1][i][3]), colors[i], 1, cv::LINE_AA);
+            cv::putText(line_image, "line", centers[i], cv::FONT_HERSHEY_SIMPLEX, 0.5, colors[i], 1, cv::LINE_AA);
         }
         //std::cout << "detected line " << i << ": " << std::endl;
         //std::cout << lines[0][i] << std::endl;
