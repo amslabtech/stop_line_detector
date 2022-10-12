@@ -1,8 +1,8 @@
 # stop_line_detector
 ## Environment
-- Ubuntu16.04
-- ROS(kinetic)
-- OpenCV(>=3.3)
+- Ubuntu20.04
+- ROS(noetic)
+- OpenCV(>=4.2)
 
 ## Published topics
 - /recognition/stop_line (amsl_navigation_msgs/StopLine)
